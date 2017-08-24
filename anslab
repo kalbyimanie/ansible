@@ -1,0 +1,11 @@
+[localhost]
+172.16.133.146
+
+[localhost:vars]
+ansible_ssh_user=centos
+ansible_ssh_pass=centos
+ansible_become_user=root
+ansible_become_pass=redhat
+ansible_ssh_port=12345
+ansible_become_method=su
+

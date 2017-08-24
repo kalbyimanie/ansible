@@ -1,0 +1,45 @@
+---
+- hosts: all
+  gather_facts: no
+  become: true
+  tasks:
+   - name: backup /etc/yum.conf
+     shell: ( cd /etc; mv yum.conf yum.conf.bak )
+   - name: backup /etc/rhsm/rhsm.conf
+     shell: ( cd /etc/rhsm; mv rhsm.conf rhsm.conf.bak )
+   - name: copy /etc/yum.conf
+     copy: src=/home/kalby-imanie/playbook/test/temp-conf/yum.conf dest=/etc/yum.conf
+   - name: copy /etc/rhsm/rhsm.conf
+     copy: src=/home/kalby-imanie/playbook/test/temp-conf/rhsm.conf dest=/etc/rhsm/rhsm.conf
+   - name: copying new repository to /etc/yum.repos.d/ftp-local.repo
+     copy: src=/home/kalby-imanie/playbook/test/temp-conf/ftp-local.repo dest=/etc/yum.repos.d/ftp-local.repo
+   - name: copying new repository to /etc/yum.repos.d/updatelocal.repo
+     copy: src=/home/kalby-imanie/playbook/test/temp-conf/updatelocal.repo dest=/etc/yum.repos.d/updatelocal.repo
+   - name: copying /var/cache/yum to /media 
+     copy: src=/home/kalby-imanie/playbook/test/temp-conf/*.tar.gz dest=/media
+   - name: extract /var/cache/yum from /media 
+     shell: ( cd /media; tar -xvf *.tar.gz )
+   - name: remove before sosreport
+     shell: ( rm -rf /var/tmp/sosreport-* )
+   - name: generate after sosreport
+     shell: ( /usr/sbin/sosreport --batch ) 
+   - name: seeking sosreport
+     shell : ( find /var/tmp -name "sosreport-*" )|cut -d '/' -f4
+     register: select_sosre
+   - name: copy sosreport
+     fetch: src=/var/tmp/{{ item }} dest=sosreport-after-localhost/ flat=yes
+     with_items: "{{ select_sosre.stdout_lines }}"
+
+
+# REQUIREMENTS FOR RHEL 6 #
+# 1. /etc/yum.conf (pull) + bak
+# 2. /etc/rhsm/rhsm.conf (pull) + bak
+# 3. /var/cache/yum/*.tar/.gz (pull)
+# 4. /etc/yum.repos.d/ftp-local.repo (pull)
+# 5. /etc/yum.repos.d/localupdate.repo (pull)
+
+# NOTES #
+# 1. ASUMPTION LOCALREPO IS STORED ON /MEDIA HENCE MATCHING IT WITH LOCALUPDATE.REPO#
+# 2. CHECK THE FULL NAME OF cache.tar.gz
+# 3. CHECK THE DEFAULT SOSEPORT PATH, Should be on /tmp/sosreport-* for RHEL 6 #
+# 4. CHECK ALL THE FULL PATH FOR src module #

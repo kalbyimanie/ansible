@@ -1,0 +1,56 @@
+---
+- hosts: all
+  gather_facts: no
+  become: true
+  tasks:
+   - name: Sending script files to servers
+     copy: src=/home/kalby-imanie/Documents/Work/XL-VAS/RHEL-vulnerability-check dest=/root
+   - name: set the script to executable files
+     shell: ( cd /root/RHEL-vulnerability-check; chmod +x *.sh )
+#   - name: running non externalpackagerhel
+#     shell: ( rpm -qa | perl -ne '$x=`rpm -qi $_`;print unless $x =~ /Vendor\s+\:\s+Red Hat/';) >> /root/externalpackagerhel.txt
+#   - name: installing yum-plugin-security sssd-ipa sssd-common
+#     yum: name={{ item }} state=present
+#     with_items:
+#       - yum-plugin-security
+#       - sssd-ipa
+#       - sssd-common
+#   - name: searching for matahari(nginx) packages
+#     shell: ( rpm -qa | grep ^nginx* ) #CHECK AGAIN
+#     register: matahari
+#   - name: removing matahari packages
+#     yum: name={{ item }} state=absent
+#     with_items: "{{ matahari.stdout_lines }}"
+   - name: running yum updateinfo list
+     shell: ( yum updateinfo list )
+   - name: running yum --security check-update
+     shell: ( yum --security check-update >> /root/check-update.txt )
+   - name: running yum info-sec
+     shell: ( yum info-sec )
+   - name: running yum updateinfo summary
+     shell: ( yum updateinfo summary >> /root/updateinfo-summary.txt ) 
+   - name: running cat info command
+     shell: ( echo -e "\n\n[UNAME]:\n`uname -a`\n\n[RELEASE]:\n`cat /etc/*release`\n\n[DATE]:\n`date`" >>/root/cat-info.txt )
+   - name: renaming to check-non-redhat-pkg.sh.bak
+     shell: ( cd /root/RHEL-vulnerability-check; mv check-non-redhat-pkg.sh check-non-redhat-pkg.sh.bak )
+   - name: running script info
+     shell: ( cd /root/RHEL-vulnerability-check; for i in *.sh;do echo $i>>/root/scriptinfo.txt;bash $i>>/root/scriptinfo.txt;done )
+
+# IMPLEMENTATION #
+# 1. running non redhat package
+# 2. 
+
+
+# REQUIREMENTS FOR RHEL 6 #
+# 1. /etc/yum.conf (pull) + bak
+# 2. /etc/rhsm/rhsm.conf (pull) + bak
+# 3. /var/cache/yum/*.tar/.gz (pull)
+# 4. /etc/yum.repos.d/ftp-local.repo (pull)
+# 5. /etc/yum.repos.d/localupdate.repo (pull)
+
+# NOTES #
+# 1. ASUMPTION LOCALREPO IS STORED ON /MEDIA HENCE MATCHING IT WITH LOCALUPDATE.REPO#
+# 2. CHECK THE FULL NAME OF cache.tar.gz
+# 3. CHECK THE DEFAULT SOSEPORT PATH, Should be on /tmp/sosreport-* for RHEL 6 #
+# 4. CHECK ALL THE FULL PATH FOR src module #
+

@@ -1,0 +1,29 @@
+---
+- hosts: all
+  gather_facts: no
+  become: true
+  tasks:
+   - name: pulling /etc/yum.conf
+     fetch: src=/etc/yum.conf dest=temp-conf/ flat=yes
+   - name: pulling /etc/rhsm/rhsm.conf
+     fetch: src=/etc/rhsm/rhsm.conf dest=temp-conf/ flat=yes
+   - name: pulling /etc/yum.repos.d/ftp-local.repo
+     fetch: src=/etc/yum.repos.d/ftp-local.repo dest=temp-conf/ flat=yes
+   - name: pulling /var/cache/yum/*.tar.gz
+     fetch: src=/var/cache/yum/*.tar.gz dest=temp-conf/ flat=yes
+   - name: pulling /etc/yum.repos.d/localupdate.repo
+     fetch: src=/etc/yum.repos.d/localupdate.repo dest=temp-conf/ flat=yes
+
+# REQUIREMENTS FOR RHEL 6 #
+# 1. /etc/yum.conf (pull) + bak
+# 2. /etc/rhsm/rhsm.conf (pull) + bak
+# 3. /var/cache/yum/*.tar/.gz (pull)
+# 4. /etc/yum.repos.d/ftp-local.repo (pull)
+# 5. /etc/yum.repos.d/localupdate.repo (pull)
+
+# NOTES #
+# 1. ASUMPTION LOCALREPO IS STORED ON /MEDIA HENCE MATCHING IT WITH LOCALUPDATE.REPO#
+# 2. CHECK THE FULL NAME OF cache.tar.gz
+# 3. CHECK THE DEFAULT SOSEPORT PATH, Should be on /tmp/sosreport-* for RHEL 6 #
+# 4. CHECK ALL THE FULL PATH FOR src module #
+
