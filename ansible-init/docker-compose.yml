@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  ansible-server:
+    container_name: ansible-server
+    hostname: ansible-server
+    build: 
+      context: .
+      dockerfile: ansible-alpine.Dockerfile
+    volumes:
+      - ../playbooks:/root/playground/playbooks
+      - ../group_vars:/root/playground/group_vars
+      - ../roles:/root/playground/roles
+      - ../hosts:/root/playground/hosts
+    networks: 
+      - ansible
+  slave1:
+    container_name: slave1
+    build:
+      context: .
+      dockerfile: ansible-alpine.Dockerfile
+    volumes:
+      - ../playbooks:/root/playground/playbooks
+      - ../group_vars:/root/playground/group_vars
+      - ../roles:/root/playground/roles
+      - ../hosts:/root/playground/hosts
+    networks: 
+      - ansible
+  slave2:
+    container_name: slave2
+    build: 
+      context: .
+      dockerfile: ansible-alpine.Dockerfile
+    volumes:
+      - ../playbooks:/root/playground/playbooks
+      - ../group_vars:/root/playground/group_vars
+      - ../roles:/root/playground/roles
+      - ../hosts:/root/playground/hosts
+    networks: 
+      - ansible
+
+networks:
+  ansible:
+    driver: bridge
+    
+
