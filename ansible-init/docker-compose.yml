@@ -8,35 +8,28 @@ services:
       dockerfile: ansible-alpine.Dockerfile
     volumes:
       - ../playbooks:/root/playground/playbooks
-      - ../group_vars:/root/playground/group_vars
+      - ../vars:/root/playground/vars
       - ../roles:/root/playground/roles
       - ../hosts:/root/playground/hosts
+      - ../config:/root/playground/config
+      - ../deploy:/root/playground/deploy
     networks: 
       - ansible
   slave1:
     container_name: slave1
+    hostname: slave1
     build:
       context: .
       dockerfile: ansible-alpine.Dockerfile
-    volumes:
-      - ../playbooks:/root/playground/playbooks
-      - ../group_vars:/root/playground/group_vars
-      - ../roles:/root/playground/roles
-      - ../hosts:/root/playground/hosts
     networks: 
       - ansible
-  slave2:
-    container_name: slave2
-    build: 
-      context: .
-      dockerfile: ansible-alpine.Dockerfile
-    volumes:
-      - ../playbooks:/root/playground/playbooks
-      - ../group_vars:/root/playground/group_vars
-      - ../roles:/root/playground/roles
-      - ../hosts:/root/playground/hosts
-    networks: 
-      - ansible
+  # slave2:
+  #   container_name: slave2
+  #   build: 
+  #     context: .
+  #     dockerfile: ansible-alpine.Dockerfile
+  #   networks: 
+  #     - ansible
 
 networks:
   ansible:

@@ -1,0 +1,42 @@
+---
+- name: create scripts directory
+  file:
+    path: /opt/nginx
+    state: directory
+  become: yes
+
+- name: create nginx pid directory
+  file:
+    path: /run/nginx
+    state: directory
+  become: yes
+
+- name: copy installation script for nginx
+  become: yes
+  template:
+    src: install.sh.j2
+    dest: /opt/nginx/install.sh
+    mode: 0744
+    
+- name: copy start up script for nginx
+  become: yes
+  template:
+    src: init.sh.j2
+    dest: /opt/nginx/init.sh
+    mode: 0744
+
+- name: install nginx
+  become: yes
+  shell: /opt/nginx/install.sh
+
+
+- name: start up nginx service
+  become: yes
+  shell: |
+    sh -c "
+      cat <<EOT >> /etc/network/interfaces
+      auto lo
+      iface lo inet loopback
+      EOT;
+      rc-status && rc-service nginx start
+    "

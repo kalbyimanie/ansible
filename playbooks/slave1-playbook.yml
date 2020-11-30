@@ -1,0 +1,9 @@
+---
+- name: slave1 playbook
+  hosts: "slave1"
+  user: "{{ user }}"
+  vars_files:
+    - "../vars/users.yml"      
+  
+  roles:
+    - setup-nginx
