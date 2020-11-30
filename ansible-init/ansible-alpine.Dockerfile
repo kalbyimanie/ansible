@@ -1,12 +1,12 @@
-FROM alpine:3.12.1 AS base
+FROM alpine:3.5 AS base
 RUN apk --update --no-cache add python3 \
-                                openssh-client \
-                                openssh-server \
+                                openssh \
                                 vim \
                                 ansible \
                                 net-tools \
                                 iputils \
                                 bash \
+                                util-linux \
                                 openrc && \
                                 rm -rf /var/cache/apk/*
 
@@ -24,11 +24,16 @@ COPY ssh_keys/playground.pub /etc/ssh/ssh_host_rsa_key.pub
 FROM config_files AS services
 # start ssh service
 EXPOSE 22
-VOLUME ["/sys/fs/cgroup"]
-RUN mkdir -p /run/openrc && touch /run/openrc/softlevel && \
+VOLUME /sys/fs/cgroup
+RUN rc-update add sshd default && \
+    mkdir -p /run/openrc && touch /run/openrc/softlevel && \
     sed -i '/^#Port\ 22/s/^#//' /etc/ssh/sshd_config && \
-    sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin.*/PermitRootLogin\ yes/' /etc/ssh/sshd_config && \
     echo "root:root" | chpasswd && \
-    sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_rsa_key/HostKey \/etc\/ssh\/ssh_host_rsa_key/g' /etc/ssh/sshd_config && \
-    rc-update add sshd
-CMD ["/usr/sbin/sshd","-D"]
+    sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_rsa_key/HostKey \/etc\/ssh\/ssh_host_rsa_key/g' /etc/ssh/sshd_config
+    
+
+WORKDIR /root/playground
+ENV PATH "$PATH:/root/playground/deploy"
+
+CMD ["sh","-c", "rc-status; rc-service sshd start; crond -f"]
