@@ -3,7 +3,8 @@
   hosts: "slave1"
   user: "{{ user }}"
   vars_files:
-    - "../vars/users.yml"      
+    - "../vars/users.yml"
+    - "../../vault.yml"      
   
   roles:
     - setup-nginx
