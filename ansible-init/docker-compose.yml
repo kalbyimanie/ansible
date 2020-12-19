@@ -13,6 +13,7 @@ services:
       - ../hosts:/root/playground/hosts
       - ../config:/root/playground/config
       - ../deploy:/root/playground/deploy
+      - ../vault.yml:/root/playground/vault.yml
     networks: 
       - ansible
   slave1:
@@ -23,13 +24,13 @@ services:
       dockerfile: ansible-alpine.Dockerfile
     networks: 
       - ansible
-  # slave2:
-  #   container_name: slave2
-  #   build: 
-  #     context: .
-  #     dockerfile: ansible-alpine.Dockerfile
-  #   networks: 
-  #     - ansible
+  slave2:
+    container_name: slave2
+    build: 
+      context: .
+      dockerfile: ansible-alpine.Dockerfile
+    networks: 
+      - ansible
 
 networks:
   ansible:
