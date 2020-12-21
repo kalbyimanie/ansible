@@ -1,4 +1,4 @@
-FROM alpine:3.5 AS base
+FROM alpine:latest AS base
 RUN apk --update --no-cache add python3 \
                                 openssh \
                                 vim \

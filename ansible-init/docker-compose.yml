@@ -14,19 +14,42 @@ services:
       - ../config:/root/playground/config
       - ../deploy:/root/playground/deploy
       - ../vault.yml:/root/playground/vault.yml
+      - ../.vault_password:/root/playground/.vault_password
     networks: 
       - ansible
+
   slave1:
+    cap_add:
+      - NET_ADMIN
     container_name: slave1
     hostname: slave1
+    volumes:
+      - /sys/fs/cgroup
     build:
       context: .
       dockerfile: ansible-alpine.Dockerfile
     networks: 
       - ansible
+
   slave2:
+    cap_add:
+      - NET_ADMIN
     container_name: slave2
+    hostname: slave2
     build: 
+      context: .
+      dockerfile: ansible-alpine.Dockerfile
+    networks: 
+      - ansible
+      
+  nginx-server:
+    cap_add:
+      - NET_ADMIN
+    container_name: nginx-server
+    hostname: nginx-server
+    volumes:
+      - /sys/fs/cgroup
+    build:
       context: .
       dockerfile: ansible-alpine.Dockerfile
     networks: 
