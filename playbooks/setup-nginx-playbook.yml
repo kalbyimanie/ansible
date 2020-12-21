@@ -4,7 +4,7 @@
   user: "{{ user }}"
   vars_files:
     - "../vars/users.yml"
-    - "../vault.yml"      
+    - "../vault.yml"
   
   roles:
     - setup-nginx
