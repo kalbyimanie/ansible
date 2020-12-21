@@ -1,10 +1,10 @@
 ---
-- name: slave1 playbook
-  hosts: "slave1"
+- name: setup nginx
+  hosts: "nginx"
   user: "{{ user }}"
   vars_files:
     - "../vars/users.yml"
-    - "../../vault.yml"      
+    - "../vault.yml"      
   
   roles:
     - setup-nginx

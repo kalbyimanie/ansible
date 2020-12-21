@@ -1,1 +1,6 @@
+[local]
 slave1
+slave2
+
+[nginx]
+nginx-server
