@@ -1,3 +1,4 @@
 ansible-init/ssh_keys/*
 plabooks/*.retry
 .*
+gcp

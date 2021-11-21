@@ -5,7 +5,7 @@ services:
     hostname: ansible-server
     build: 
       context: .
-      dockerfile: ansible-alpine.Dockerfile
+      dockerfile: ubuntu.Dockerfile
     volumes:
       - ../playbooks:/root/playground/playbooks
       - ../vars:/root/playground/vars
@@ -18,42 +18,53 @@ services:
     networks: 
       - ansible
 
-  slave1:
-    cap_add:
-      - NET_ADMIN
-    container_name: slave1
-    hostname: slave1
-    volumes:
-      - /sys/fs/cgroup
-    build:
-      context: .
-      dockerfile: ansible-alpine.Dockerfile
-    networks: 
-      - ansible
+  # slave1:
+  #   cap_add:
+  #     - NET_ADMIN
+  #   container_name: slave1
+  #   hostname: slave1
+  #   volumes:
+  #     - /sys/fs/cgroup
+  #   build:
+  #     context: .
+  #     dockerfile: ubuntu.Dockerfile
+  #   networks: 
+  #     - ansible
 
-  slave2:
+  # slave2:
+  #   cap_add:
+  #     - NET_ADMIN
+  #   container_name: slave2
+  #   hostname: slave2
+  #   build: 
+  #     context: .
+  #     dockerfile: ubuntu.Dockerfile
+  #   networks: 
+  #     - ansible
+
+  slave3:
     cap_add:
       - NET_ADMIN
-    container_name: slave2
-    hostname: slave2
+    container_name: slave3
+    hostname: slave3
     build: 
       context: .
-      dockerfile: ansible-alpine.Dockerfile
+      dockerfile: ubuntu-1604.Dockerfile
     networks: 
       - ansible
       
-  nginx-server:
-    cap_add:
-      - NET_ADMIN
-    container_name: nginx-server
-    hostname: nginx-server
-    volumes:
-      - /sys/fs/cgroup
-    build:
-      context: .
-      dockerfile: ansible-alpine.Dockerfile
-    networks: 
-      - ansible
+  # nginx-server:
+  #   cap_add:
+  #     - NET_ADMIN
+  #   container_name: nginx-server
+  #   hostname: nginx-server
+  #   volumes:
+  #     - /sys/fs/cgroup
+  #   build:
+  #     context: .
+  #     dockerfile: ubuntu.Dockerfile
+  #   networks: 
+  #     - ansible
 
 networks:
   ansible:

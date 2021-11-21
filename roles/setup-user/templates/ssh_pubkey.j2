@@ -1,0 +1,5 @@
+
+
+##### Added by Ansible #####
+# user {{ users[user_name].username }} #
+{% for sshpubkey in users[user_name].sshpubkey %}{{ sshpubkey }}{{ "\n " if loop.last }}{% endfor %}

@@ -1,0 +1,30 @@
+users: 
+  adib:
+    username: adib
+    userpass: adib
+    sshpubkey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsgNnp1FjtCe6ByNFd24ZUPXOWT+BzoaHSKX8G1CFsxRHU9nJQpKzW6AReaI0olSqUw4zoOMNvU8Dx6+5AqUM9G+enm4UG+q8Vbo0eTuSpdaSfFyY2d490wwaUZn/B3fAAAnGsRpAeu25Nl6E5d5NF7gNbXLpVZ2yvmpaNd32tl4sk9Ixi0fNUO+85uGAEJaZ2Z/ZYowekb4JE4pocp9GZA81Orx1xgN94hbXVEkZlXV5oVcNX+tO2yI9n2rRFKxIb0AHIIuQOAdtDMX9W/huaLlUyE/tH5P5w+VkZoLeXcX4nvrxN6uHOLpF8V9nxSx6k/y0lpW7BZHdL0hVeqrXkITte8nsnEznGF1a6Bug8m9ejL/gK4Xxhg40kNA3tLJMBUbcn1GR39slB6zewjmthVOP09pQ7LFPSqlqyeGwW2CB3VEmHJQdwzyNzytOfzoKKkoNEdlVilimgOKKbuCqrTQ1QP1iTZ7jZXOTYpSsKjIbJP4vCKrZoUUS2tw+qUw0= kalbyimanie@Kalby-Imanie.local
+    usergroup:
+      groupname:
+        - adib
+    commands:
+      path:
+        - /usr/sbin/useradd
+        - /usr/sbin/userdel
+  test:
+    username: test
+    userpass: test
+    sshpubkey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsgNnp1FjtCe6ByNFd24ZUPXOWT+BzoaHSKX8G1CFsxRHU9nJQpKzW6AReaI0olSqUw4zoOMNvU8Dx6+5AqUM9G+enm4UG+q8Vbo0eTuSpdaSfFyY2d490wwaUZn/B3fAAAnGsRpAeu25Nl6E5d5NF7gNbXLpVZ2yvmpaNd32tl4sk9Ixi0fNUO+85uGAEJaZ2Z/ZYowekb4JE4pocp9GZA81Orx1xgN94hbXVEkZlXV5oVcNX+tO2yI9n2rRFKxIb0AHIIuQOAdtDMX9W/huaLlUyE/tH5P5w+VkZoLeXcX4nvrxN6uHOLpF8V9nxSx6k/y0lpW7BZHdL0hVeqrXkITte8nsnEznGF1a6Bug8m9ejL/gK4Xxhg40kNA3tLJMBUbcn1GR39slB6zewjmthVOP09pQ7LFPSqlqyeGwW2CB3VEmHJQdwzyNzytOfzoKKkoNEdlVilimgOKKbuCqrTQ1QP1iTZ7jZXOTYpSsKjIbJP4vCKrZoUUS2tw+qUw0= kalbyimanie@Kalby-Imanie.local
+    usergroup:
+      groupname:
+        - test
+        - yoga
+    commands:
+      path:
+        - /usr/sbin/useradd
+        - /usr/sbin/userdel
+
+groups:
+  de:
+    groupname: de
+    grantedpath:
+      - /usr/sbin
