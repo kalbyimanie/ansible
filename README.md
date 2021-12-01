@@ -1,7 +1,7 @@
 # Learning ansible with ansible-playbook
 This repository is meant to be a playground to learn ansible or ansible-playbook.
 
-__Setup the environment as docker container :__<br>
+__Setup the environment as docker containers :__<br>
 
 - Go to directory _ansible-init_
 - Create new directory named _ssh_keys_ under directory _ansible-init_
