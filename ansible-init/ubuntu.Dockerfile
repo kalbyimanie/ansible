@@ -1,6 +1,8 @@
-FROM ubuntu:18.04 AS base
+FROM ubuntu:22.04 AS base
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
 
 # Install dependencies.
 RUN apt-get update \

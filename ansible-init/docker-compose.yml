@@ -3,7 +3,7 @@ services:
   ansible-server:
     container_name: ansible-server
     hostname: ansible-server
-    build: 
+    build:
       context: .
       dockerfile: ubuntu.Dockerfile
     volumes:
@@ -11,60 +11,35 @@ services:
       - ../vars:/root/playground/vars
       - ../roles:/root/playground/roles
       - ../hosts:/root/playground/hosts
-      - ../config:/root/playground/config
+      - ../config/ansible.cfg:/root/.ansible.cfg
+      - ../config/bashrc:/root/.bashrc
       - ../deploy:/root/playground/deploy
       - ../vault.yml:/root/playground/vault.yml
       - ../.vault_password:/root/playground/.vault_password
-    networks: 
+    networks:
       - ansible
 
-  # slave1:
-  #   cap_add:
-  #     - NET_ADMIN
-  #   container_name: slave1
-  #   hostname: slave1
-  #   volumes:
-  #     - /sys/fs/cgroup
-  #   build:
-  #     context: .
-  #     dockerfile: ubuntu.Dockerfile
-  #   networks: 
-  #     - ansible
-
-  # slave2:
-  #   cap_add:
-  #     - NET_ADMIN
-  #   container_name: slave2
-  #   hostname: slave2
-  #   build: 
-  #     context: .
-  #     dockerfile: ubuntu.Dockerfile
-  #   networks: 
-  #     - ansible
-
-  slave3:
+  slave1:
     cap_add:
       - NET_ADMIN
-    container_name: slave3
-    hostname: slave3
+    container_name: slave1
+    hostname: slave1
     build: 
       context: .
-      dockerfile: ubuntu-1604.Dockerfile
+      dockerfile: ubuntu.Dockerfile
     networks: 
       - ansible
-      
-  # nginx-server:
-  #   cap_add:
-  #     - NET_ADMIN
-  #   container_name: nginx-server
-  #   hostname: nginx-server
-  #   volumes:
-  #     - /sys/fs/cgroup
-  #   build:
-  #     context: .
-  #     dockerfile: ubuntu.Dockerfile
-  #   networks: 
-  #     - ansible
+
+  slave2:
+    cap_add:
+      - NET_ADMIN
+    container_name: slave2
+    hostname: slave2
+    build:
+      context: .
+      dockerfile: ubuntu-1604.Dockerfile
+    networks:
+      - ansible
 
 networks:
   ansible:

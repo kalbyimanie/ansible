@@ -1,6 +1,8 @@
 FROM ubuntu:16.04 AS base
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
 
 # Install dependencies.
 RUN apt-get update \
@@ -30,7 +32,7 @@ FROM base AS additional_pkgs
 
 # Upgrade pip to latest version.
 # RUN pip3 install --upgrade pip
-                           
+
 # Install Ansible via Pip.
 # RUN pip3 install ansible
 

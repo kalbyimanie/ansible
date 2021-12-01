@@ -1,0 +1,12 @@
+---
+- name: echo messages
+  hosts: all
+
+  pre_tasks:
+    - name: echo messages
+      shell: |
+        echo "some messages"
+      register: output
+
+    - debug:
+        msg: "{{ output.stdout }}"

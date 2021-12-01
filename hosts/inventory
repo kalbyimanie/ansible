@@ -1,8 +1,2 @@
-[local]
 slave1
-
-[nginx]
-nginx-server
-
-[slave3]
-slave3
+slave2
