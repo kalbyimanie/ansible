@@ -37,7 +37,7 @@ services:
     hostname: slave2
     build:
       context: .
-      dockerfile: ubuntu-1604.Dockerfile
+      dockerfile: ubuntu-2204.Dockerfile
     networks:
       - ansible
 

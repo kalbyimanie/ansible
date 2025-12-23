@@ -32,8 +32,10 @@ RUN sed -i 's/^\($ModLoad imklog\)/#\1/' /etc/rsyslog.conf
 FROM base AS additional_pkgs
 # Upgrade pip to latest version.
 RUN pip3 install --upgrade pip
-# Install Ansible via Pip.
-RUN pip3 install ansible
+# Install Ansible compatible with Python 3.5 (for slave2 Ubuntu 16.04)
+# ansible 2.9.27 is the last version supporting Python 3.5
+# ansible-core was introduced in 2.11+, so we use the older 'ansible' package
+RUN pip3 install "ansible==2.9.27"
 
 # Fix potential UTF-8 errors with ansible-test.
 RUN locale-gen en_US.UTF-8

@@ -1,2 +1,2 @@
-slave1
-slave2
+slave1 ansible_python_interpreter=/usr/bin/python3
+slave2 ansible_python_interpreter=/usr/bin/python3
