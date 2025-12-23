@@ -4,8 +4,7 @@
   user: root
 
   vars_files:
-    # - ../vars/user_config.yml
-    - ../vars/{{ user_config_file }}
+    - ../vars/{{ user_config_file | default('user_config.yml') }}
 
   pre_tasks:
 
@@ -22,11 +21,12 @@
 
     - name: Gather userdata
       set_fact:
-        gather_users: "{{ item.username }}"
-        gather_groups: "{{ item.usergroup.groupname }}"
-        gather_cmd: "{{ item.commands.path }}"
-      with_items:
-        - "{{ users[user_name] }}"
+        gather_users: "{{ item.value.username }}"
+        gather_groups: "{{ item.value.usergroup.groupname }}"
+        gather_cmd: "{{ item.value.commands.path }}"
+        current_user_key: "{{ item.key }}"
+        current_user_data: "{{ item.value }}"
+      with_dict: "{{ users }}"
       tags:
         - 'gather_userdata'
         - 'add_user'
@@ -45,11 +45,10 @@
       tags:
         - 'add_new_group'
 
-    - name: "Check username {{ gather_users }} in user config, refer to vars_file"
+    - name: "Check usernames in user config, refer to vars_file"
       debug:
-        msg: "{{ item }}"
-      with_items:
-        - "{{ users[user_name].username }}"
+        msg: "{{ item.value.username }}"
+      with_dict: "{{ users }}"
       tags:
         - 'gather_userdata'
         - 'add_user'
@@ -61,20 +60,22 @@
       register: filter_username
       when: new_group_name is not defined
       
-    - name: "Check if username {{ gather_users }} already exists on the servers"
-      shell: 'getent passwd {{ user_name }}'
+    - name: "Check if usernames already exist on the servers"
+      shell: 'getent passwd {{ item.value.username }}'
+      with_dict: "{{ users }}"
       tags: ['add_user']
       register: validate_user
       ignore_errors: yes
       when: new_group_name is not defined
 
-    - name: Fail if the user {{ gather_users }} exists
+    - name: Fail if any user already exists
       fail:
-        msg: username already exists"
+        msg: "User {{ item.item.value.username }} already exists"
       when: 
-        - '"{{ validate_user.rc }}" == "0"'
-        - retry is not defined # NOTE validate retry flag
+        - item.rc | int == 0
+        - retry is not defined
         - new_group_name is not defined
+      with_items: "{{ validate_user.results | default([]) }}"
       tags: ['add_user']
 
   roles:
@@ -82,23 +83,26 @@
 
   post_tasks:
       # NOTE modify this
-    - name: "Output of creating/modifying user {{ gather_users }}"
-      shell: 'getent passwd {{ user_name }}'
+    - name: "Output of creating/modifying users"
+      shell: 'getent passwd {{ item.value.username }}'
+      with_dict: "{{ users }}"
       tags: ['add_user', 'modify_user_pass']
       register: single_user
-    - debug: msg={{ single_user.stdout_lines }}
+    - debug: 
+        msg: "{{ item.stdout_lines }}"
+      with_items: "{{ single_user.results | default([]) }}"
       tags: ['add_user', 'modify_user_pass']
 
       # NOTE copy this
     - debug: msg={{ delete_user }}
       tags: ['delete_user']
 
-    - name: "output of granting user {{ gather_users }} to execute selected administrative commands"
+    - name: "output of granting users to execute selected administrative commands"
       debug: msg={{ add_admin_cmd }}
       tags: ['add_admin_cmd']
-    - name: "output of adding/modifying group {{ gather_groups }} to user {{ gather_users }}"
+    - name: "output of adding/modifying groups to users"
       debug: msg={{ add_user_to_other_group }}
       tags: ['add_user_to_other_group']
-    - name: "output of authorizing user {{ gather_users }}"
+    - name: "output of authorizing users"
       debug: msg={{ add_ssh_pubkey }}
       tags: ['add_user', 'add_ssh_pubkey']

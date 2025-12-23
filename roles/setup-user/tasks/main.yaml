@@ -1,87 +1,84 @@
 ---
-- name: create user {{ gather_users }}
+- name: create users
   become: yes
   user:
-    name: "{{ item.username }}"
-    password: "{{ item.userpass | password_hash('sha512') }}"
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.userpass | password_hash('sha512') }}"
     state: present
     shell: /bin/bash
     createhome: yes
-    home: "/home/{{ item.username }}"
-  with_items:
-    - "{{ users[user_name] }}"
+    home: "/home/{{ item.value.username }}"
+  with_dict: "{{ users }}"
   tags: ['add_user']
   register: 'add_user'
 
-- name: modify user password for {{ gather_users }}
+- name: modify user passwords
   become: yes
   user:
-    name: "{{ item.username }}"
-    password: "{{ item.userpass | password_hash('sha512') }}"
-  with_items:
-    - "{{ users[user_name] }}"
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.userpass | password_hash('sha512') }}"
+  with_dict: "{{ users }}"
   tags: ['modify_user_pass']
   register: 'modify_user_pass'
 
-- name: Confirm to delete user 
+- name: Confirm to delete users 
   pause:
-    prompt: Are you sure want to delete user {{ gather_users }} ? (press enter to continue OR ctrl + c then a, to abort)
+    prompt: Are you sure want to delete all users from config? (press enter to continue OR ctrl + c then a, to abort)
   tags: ['delete_user']
 
 # NOTE backup user home dir before deleting user
 - name: create backup user home dir files
   become: yes
   file:
-    path: "/home/users-backup/{{ item.username }}"
+    path: "/home/users-backup/{{ item.value.username }}"
     state: directory  
-    owner: "{{ item.username }}"
-    group: "{{ item.username }}"
-  with_items:
-    - "{{ users[user_name] }}"
+    owner: "{{ item.value.username }}"
+    group: "{{ item.value.username }}"
+  with_dict: "{{ users }}"
   register: 'create_home_dir_bak'
   tags: ['delete_user', 'create_home_dir_bak']
 
 - name: backup user home dir files
   become: yes
-  shell: cp -rpv /home/{{ item.username }} /home/users-backup/
-  with_items:
-    - "{{ users[user_name] }}"
+  shell: cp -rpv /home/{{ item.value.username }} /home/users-backup/
+  with_dict: "{{ users }}"
   register: 'copy_home_dir_bak'
   tags: ['delete_user', 'copy_home_dir_bak']
 
-- name: delete user {{ gather_users }}
+- name: delete users
   become: yes
   user:
-    name: "{{ item.username }}"
+    name: "{{ item.value.username }}"
     state: absent
     remove: yes
     force: yes
-  with_items:
-    - "{{ users[user_name] }}"
+  with_dict: "{{ users }}"
   tags: ['delete_user']
   register: 'delete_user'
 
 - name: checking for available user sudoers command
   become: yes
-  shell: cat /etc/sudoers | grep -c "%{{ item.username }}"
+  shell: cat /etc/sudoers | grep -c "%{{ item.value.username }}"
   ignore_errors: yes
-  with_items:
-    - "{{ users[user_name] }}"
+  loop: "{{ users | dict2items }}"
   register: 'check_sudoers_line'
   tags: ['add_admin_cmd']
 
-- name: replace line to grant user {{ gather_users }} to execute selected administrative commands
+- name: replace line to grant users to execute selected administrative commands
   become: yes
   lineinfile:
-    regexp: '^%{{ user_name }}.*'
+    regexp: '^%{{ item.item.value.username }}.*'
     line: "{{ lookup('template', 'add_admin_cmd.j2') }}"
     path: "/etc/sudoers"
   tags: ['add_admin_cmd']
   register: 'add_admin_cmd'
   when: item.stdout == '1'
-  with_items: "{{ check_sudoers_line.results }}"
+  loop: "{{ check_sudoers_line.results }}"
+  vars:
+    user_key: "{{ item.item.key }}"
+    user_data: "{{ item.item.value }}"
 
-- name: add line to grant user {{ gather_users }} to execute selected administrative commands
+- name: add line to grant users to execute selected administrative commands
   become: yes
   lineinfile:
     line: "{{ lookup('template', 'add_admin_cmd.j2') }}"
@@ -89,7 +86,10 @@
   tags: ['add_admin_cmd']
   register: 'add_admin_cmd'
   when: item.stdout == '0'
-  with_items: "{{ check_sudoers_line.results }}"
+  loop: "{{ check_sudoers_line.results }}"
+  vars:
+    user_key: "{{ item.item.key }}"
+    user_data: "{{ item.item.value }}"
 
 - name: sudoers syntax check
   become: yes
@@ -101,60 +101,68 @@
   debug: msg={{ sudoers_syntax_check.stdout_lines }}
   tags: ['add_admin_cmd']
 
-- name: add group {{ gather_groups }} to user {{ gather_users }}
+- name: add groups to users
   become: yes
   user:
-    name: "{{ item.username }}"
+    name: "{{ item.value.username }}"
     groups:
-      - "{{ item.usergroup.groupname | join(', ') }}"
+      - "{{ item.value.usergroup.groupname | join(', ') }}"
     append: no
   tags: ['add_user_to_other_group']
-  with_items:
-    - "{{ users[user_name] }}"
+  with_dict: "{{ users }}"
   register: 'add_user_to_other_group'
 
-- name: create directory .ssh for user {{ gather_users }}
+- name: create directory .ssh for users
   become: yes
   file:
-    path: "/home/{{ item.username }}/.ssh"
+    path: "/home/{{ item.value.username }}/.ssh"
     state: directory  
-    owner: "{{ item.username }}"
-    group: "{{ item.username }}"
-  with_items:
-    - "{{ users[user_name] }}"
+    owner: "{{ item.value.username }}"
+    group: "{{ item.value.username }}"
+  with_dict: "{{ users }}"
   register: 'add_ssh_dir'
   tags: ['add_user', 'create_ssh_dir']
 
-- name: create file .ssh/authorized_keys for user {{ gather_users }}
+- name: create file .ssh/authorized_keys for users
   become: yes
   file:
-    path: "/home/{{ item.username }}/.ssh/authorized_keys"
+    path: "/home/{{ item.value.username }}/.ssh/authorized_keys"
     state: touch
-    owner: "{{ item.username }}"
-    group: "{{ item.username }}" 
-  with_items:
-    - "{{ users[user_name] }}"
+    owner: "{{ item.value.username }}"
+    group: "{{ item.value.username }}" 
+  with_dict: "{{ users }}"
   register: 'add_ssh_dir'
   tags: ['add_user', 'create_ssh_dir']
 
-- name: authorized user {{ gather_users }} ssh pubkey
+- name: authorized users ssh pubkey
   become: yes
   lineinfile:
     line: "{{ lookup('template', 'ssh_pubkey.j2') }}"
-    path: "/home/{{ item.username }}/.ssh/authorized_keys"
-  with_items:
-    - "{{ users[user_name] }}"
+    path: "/home/{{ item.value.username }}/.ssh/authorized_keys"
+  loop: "{{ users | dict2items }}"
+  vars:
+    user_key: "{{ item.key }}"
+    user_data: "{{ item.value }}"
   register: 'add_ssh_pubkey'
   tags: ['add_user', 'add_ssh_pubkey']
 
 # NOTE restore user home dir 
+- name: check if backup exists
+  become: yes
+  stat:
+    path: "/home/users-backup/{{ item.value.username }}"
+  with_dict: "{{ users }}"
+  register: backup_exists
+  tags: ['add_user', 'restore_home_dir_bak']
+
 - name: restore user home dir files
   become: yes
   shell: |
-    mkdir -p /home/{{ item.username }}/{{ item.username }}-backup
-    cp -rfpv /home/users-backup/{{ item.username }} /home/{{ item.username }}/{{ item.username }}-backup
-  with_items:
-    - "{{ users[user_name] }}"
+    mkdir -p /home/{{ item.item.value.username }}/{{ item.item.value.username }}-backup
+    cp -rfpv /home/users-backup/{{ item.item.value.username }} /home/{{ item.item.value.username }}/{{ item.item.value.username }}-backup
+  when: item.stat.exists | default(false)
+  with_items: "{{ backup_exists.results | default([]) }}"
+  ignore_errors: yes
   register: 'restore_home_dir_bak'
   tags: ['add_user', 'restore_home_dir_bak']
 

@@ -18,6 +18,12 @@
     dest: /opt/nginx/install.sh
     mode: 0744
 
+- name: create network directory
+  become: yes
+  file:
+    path: /etc/network
+    state: directory
+
 - name: copy network template
   become: yes
   template:

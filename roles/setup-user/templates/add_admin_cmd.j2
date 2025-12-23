@@ -1,1 +1,1 @@
-%{{ users[user_name].username }} ALL=(ALL) NOPASSWD: {% for cmd in users[user_name].commands.path %}{{ cmd }}{{ ", " if not loop.last }}{% endfor %}
+%{{ user_data.username }} ALL=(ALL) NOPASSWD: {% for cmd in user_data.commands.path %}{{ cmd }}{{ ", " if not loop.last }}{% endfor %}
